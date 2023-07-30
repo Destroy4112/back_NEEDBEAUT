@@ -9,9 +9,16 @@ class tiendas extends Model
 {
     use HasFactory;
 
-        protected $fillable = ['nombreP', 'cedula', 'email', 'password', 'nombreN','registro' ,'ubicacion','telefono' ,
-        'imagen'];
-
-
-    
+    protected $fillable = [
+        'propietario',
+        'email',
+        'password',
+        'negocio',
+        'categoria',
+        'nit',
+        'ubicacion',
+        'telefono',
+        'perfil',
+        'portada',
+    ];
 }
