@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\tiendas;
 use App\Models\Images;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class tiendasController extends Controller
 {
 
     public function index()
     {
-        //
         $tienda = Tiendas::all();
         return response()->json($tienda);
     }
@@ -20,15 +19,16 @@ class tiendasController extends Controller
     {
         // Validar los datos del formulario
         $request->validate([
-            'nombreP' => 'required|string',
-            'cedula' => 'required|string',
+            'propietario' => 'required|string',
             'email' => 'required|string|email',
             'password' => 'required|string',
-            'nombreN' => 'required|string',
-            'registro' => 'required|string',
+            'negocio' => 'required|string',
+            'categoria' => 'required|string',
+            'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Procesar la imagen (si se cargó una)
@@ -40,15 +40,16 @@ class tiendasController extends Controller
 
         // Crear el registro de la tienda en la base de datos
         $tienda = new tiendas([
-            'nombreP' => $request->nombreP,
-            'cedula' => $request->cedula,
+            'propietario' => $request->propietario,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'nombreN' => $request->nombreN,
-            'registro' => $request->registro,
+            'negocio' => $request->negocio,
+            'categoria' => $request->categoria,
+            'nit' => $request->nit,
             'ubicacion' => $request->ubicacion,
             'telefono' => $request->telefono,
-
+            'perfil' => $request->perfil,
+            'portada' => $request->portada,
         ]);
         $tienda->save();
 
@@ -74,27 +75,24 @@ class tiendasController extends Controller
         ]);
 
         $tienda = tiendas::where("email", "=", $request->email)->first();
-        if (isset($tienda->cedula)) {
+        if (!is_null($tienda)) {
             if (Hash::check($request->password, $tienda->password)) {
                 return response()->json([
                     "status" => 1,
                     "message" => "usuario ingresado correctamente",
                 ]);
-
             } else {
                 return response()->json([
                     "status" => 0,
                     "message" => "password incorrecta",
                 ], 404);
             }
-
         } else {
             return response()->json([
                 "status" => 0,
                 "message" => "Usuario no Registrado",
             ], 404);
         }
-
     }
 
 
@@ -107,7 +105,6 @@ class tiendasController extends Controller
             'tienda' => $tienda
         ];
         return response()->json($data);
-
     }
 
     public function show(tiendas $tienda)
@@ -116,11 +113,8 @@ class tiendasController extends Controller
         return response()->json($tienda);
     }
 
-//falta probar funcionalidad de update
-
-    public function update(Request $request,Tiendas $id)
-
-
+    //falta probar funcionalidad de update
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nombreP' => 'required|string',
@@ -159,14 +153,6 @@ class tiendasController extends Controller
         // Guardar los cambios
         $tienda->save();
 
-
-        return response()->json(['message' => 'Datos tienda actualizado correctamente'], 200);
-
-        
-
+        return response()->json(['message' => 'Registro actualizado correctamente'], 200);
     }
-
-
-
-
 }

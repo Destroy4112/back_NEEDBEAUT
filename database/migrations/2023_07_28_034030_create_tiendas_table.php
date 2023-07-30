@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('tiendas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombreP');
-            $table->string('cedula')->unique();
+            $table->string('propietario');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('nombreN');
-            $table->string('registro')->unique();
+            $table->string('negocio');
+            $table->string('categoria');
+            $table->string('nit')->unique();
             $table->string('ubicacion');
             $table->string('telefono');
-            $table->string('imagen')->nullable();
+            $table->string('perfil')->nullable();
+            $table->string('portada')->nullable();        
             $table->timestamps();
         });
     }

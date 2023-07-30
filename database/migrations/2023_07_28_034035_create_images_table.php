@@ -19,6 +19,7 @@ return new class extends Migration
     
             // Definir la relación con la tabla de tiendas
             $table->foreign('tienda_id')->references('id')->on('tiendas')->onDelete('cascade');
+            
         });
     }
 
