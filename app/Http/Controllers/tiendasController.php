@@ -63,7 +63,7 @@ class tiendasController extends Controller
         ]);
 
 
-        return response()->json(['message' => 'Tienda almacenada correctamente'], 201);
+        return response()->json(['data' => $tienda], 201);
     }
 
 
@@ -79,22 +79,21 @@ class tiendasController extends Controller
             if (Hash::check($request->password, $tienda->password)) {
                 return response()->json([
                     "status" => 1,
-                    "message" => "usuario ingresado correctamente",
-                    'tienda' => $tienda
+                    "data" => $tienda
                 ]);
 
 
             } else {
                 return response()->json([
-                    "status" => 0,
+                    "status" => 2,
                     "message" => "password incorrecta",
-                ], 404);
+                ], 200);
             }
         } else {
             return response()->json([
                 "status" => 0,
                 "message" => "Usuario no Registrado",
-            ], 404);
+            ], 200);
         }
     }
 
