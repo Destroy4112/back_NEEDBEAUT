@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tienda_id'); // Referencia a la tienda
-            $table->string('image_path');
+            $table->string('perfil');
+            $table->string('portada');
             $table->timestamps();
     
             // Definir la relación con la tabla de tiendas
