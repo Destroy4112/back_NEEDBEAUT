@@ -6,6 +6,8 @@ use App\Models\tiendas;
 use App\Models\Images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class tiendasController extends Controller
 {
@@ -31,12 +33,6 @@ class tiendasController extends Controller
             'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Procesar la imagen (si se cargó una)
-        $imagen = $request->file('imagen');
-        $imagenPath = null;
-        if ($imagen) {
-            $imagenPath = $imagen->store('images', 'public');
-        }
 
         // Crear el registro de la tienda en la base de datos
         $tienda = new tiendas([
@@ -53,15 +49,19 @@ class tiendasController extends Controller
         ]);
         $tienda->save();
 
-        // Crear el registro de la imagen en la tabla de imágenes
-        if ($imagenPath) {
-            $Image = new images([
-                'tienda_id' => $tienda->id,
-                // Asociar con la tienda recién creada
-                'image_path' => $imagenPath,
-            ]);
-            $Image->save();
-        }
+
+        $perfil = $request->file('perfil')->store('public/images');
+        $portada = $request->file('portada')->store('public/images');
+
+        $perfilUrl = Storage::url($perfil);
+        $portadaUrl = Storage::url($portada);
+
+        Images::create([
+            'tienda_id' => $tienda->id,
+            'perfil' => $perfilUrl,
+            'portada' => $portadaUrl,
+        ]);
+
 
         return response()->json(['message' => 'Tienda almacenada correctamente'], 201);
     }
@@ -80,7 +80,10 @@ class tiendasController extends Controller
                 return response()->json([
                     "status" => 1,
                     "message" => "usuario ingresado correctamente",
+                    'tienda' => $tienda
                 ]);
+
+
             } else {
                 return response()->json([
                     "status" => 0,
