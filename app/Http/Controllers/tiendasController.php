@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\tiendas;
 use App\Models\Images;
+use App\Models\Categorias;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,7 @@ class tiendasController extends Controller
     public function index()
     {
         $tienda = Tiendas::all();
+
         return response()->json($tienda);
     }
     public function store(Request $request)
@@ -25,7 +27,7 @@ class tiendasController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
-            'categoria' => 'required|string',
+            'categoria_id' => 'required|integer',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
@@ -40,13 +42,14 @@ class tiendasController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'negocio' => $request->negocio,
-            'categoria' => $request->categoria,
+            'categoria_id' =>$request->categoria_id,
             'nit' => $request->nit,
             'ubicacion' => $request->ubicacion,
             'telefono' => $request->telefono,
             'perfil' => $request->perfil,
             'portada' => $request->portada,
         ]);
+       
         $tienda->save();
 
 
