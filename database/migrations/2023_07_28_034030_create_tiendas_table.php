@@ -17,13 +17,16 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('negocio');
-            $table->string('categoria');
+           
             $table->string('nit')->unique();
             $table->string('ubicacion');
             $table->string('telefono');
             $table->string('perfil')->nullable();
             $table->string('portada')->nullable();        
             $table->timestamps();
+           
+
+     
         });
     }
 

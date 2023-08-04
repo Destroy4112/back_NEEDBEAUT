@@ -14,11 +14,16 @@ class tiendas extends Model
         'email',
         'password',
         'negocio',
-        'categoria',
+        'categoria_id',
         'nit',
         'ubicacion',
         'telefono',
         'perfil',
         'portada',
     ];
+
+    public function categorias()
+    {
+        return $this->belongsTo(categoria::class, 'categoria_id');
+    }
 }
