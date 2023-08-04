@@ -34,7 +34,9 @@ class tiendasController extends Controller
             'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
+        if (!categorias::where('id', $request->categoria_id)->exists()) {
+            return response()->json(['error' => 'La categoría seleccionada no existe.'], 404);
+        }
 
         // Crear el registro de la tienda en la base de datos
         $tienda = new tiendas([
