@@ -27,9 +27,9 @@ class tiendas extends Model
   
     public function products()
     {
-        return $this->hasMany(products::class);
+        return $this->hasMany(products::class, 'tienda_id');
     }
-
+   
  protected function propietario(): Attribute{
     return new Attribute(
 
