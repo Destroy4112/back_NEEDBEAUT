@@ -26,7 +26,7 @@ class tiendasController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
-            'categoria' => 'required|string',
+            'categoria' => 'required|string|in:moda, belleza',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
@@ -57,13 +57,35 @@ class tiendasController extends Controller
         ]);
         if ($request->hasFile('perfil')) {
             $perfilPath = $request->file('perfil')->store('public/images');
-            $perfilUrl = Storage::url($perfilPath);
-            $tienda->perfil = $perfilUrl;
+           // $perfilUrl = Storage::url($perfilPath);
+            $tienda->perfil = $perfilPath;
             $tienda->save();
         }
         return response()->json(['succes' => 'Imagen de perfil subida exitosamente.'], 201);
-       
     }
+
+    //update imagen de perfil
+    public function updateimagenPerfil(Request $request, Tiendas $tienda)
+{
+    $request->validate([
+        'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048', 
+    ]);
+
+    if ($request->hasFile('perfil')) {
+        // Eliminar la imagen anterior si existe
+        if ($tienda->perfil) {
+            Storage::disk('public')->delete(str_replace('/storage', 'public', $tienda->perfil));
+        }
+        // Subir la nueva imagen
+        $perfilPath = $request->file('perfil')->store('public/images');
+        $perfilUrl = Storage::url($perfilPath);
+        $tienda->perfil = $perfilUrl;
+        $tienda->save();
+        return response()->json(['succes' => 'Imagen de perfil actualizada exitosamente.'], 201);
+    }
+    return response()->json(['Error' => 'Error al actualizar Imagen de perfil.'], 201);
+}
+
 
     public function imagenPortada(Request $request, Tiendas $tienda){
         $request->validate([
@@ -79,7 +101,30 @@ class tiendasController extends Controller
        
     }
 
+    public function tiendasPorCategoria($categoria){
+        $tiendas = Tiendas::where('categoria', $categoria)->get();
+        if ($tiendas->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron tiendas para esta categoría.'], 404);
+        }
+        return response()->json($tiendas);
+    }
+
+    public function mostrarProductosPorTienda($tiendaId)
+    {
+        $tienda = Tiendas::findOrFail($tiendaId);
+        $productos = $tienda->products->map(function ($producto){
+            return [
+                
+                'nombre' => $producto->nombre,
+                'precio' => $producto->precio,
+            ];
+        });
     
+        return response()->json($productos);
+    }
+
+
+
 
     public function login(Request $request)
     {
