@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tienda_id');
             $table->string('codigo')->unique();
             $table->string('nombre');
-            $table->integer('precio');
+            $table->string('precio');
             $table->integer('cantidad');
             $table->timestamps();
 
