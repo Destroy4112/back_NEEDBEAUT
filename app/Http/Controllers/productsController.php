@@ -18,14 +18,16 @@ class productsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'tienda_id' => 'required|exists:tiendas,id',
             'codigo' => 'required|string',
             'nombre' => 'required|string',
-            'precio' => 'required|integer',
-            'cantidad' => 'required|integer',
+            'precio' => 'required|min:3',
+            'cantidad' => 'required|integer|min:1',
         ]);
          // Crear el registro de los productos en la base de datos
          $products = products::create($request->all());
-         return response()->json(['data' => $products], 201);
+         return response()->json(['message' =>' producto guardado exitosamente'], 201);
 
     }
+   
 }
