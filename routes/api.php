@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\tiendasController;
 use App\Http\Controllers\ProductsController;
-use App\Http\Controllers\categoriasController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,6 +27,12 @@ Route::put('tiendas/{id}', [tiendasController::class, 'update']);
 Route::delete('tiendas/{tienda}', [tiendasController::class, 'destroy']);
 Route::get('tiendas/{tienda}', [tiendasController::class, 'show']);
 Route::get('tiendas/{categoria_id}', [tiendasController::class, 'category']);
-
 Route::post('tiendas/{tienda}/imagenPerfil',[tiendasController::class, 'imagenPerfil']);
 Route::post('tiendas/{tienda}/imagenPortada',[tiendasController::class, 'imagenPortada']);
+Route::get('tiendas/categoria/{categoria}',[tiendasController::class, 'tiendasPorCategoria']);
+Route::patch('tiendas/{tienda}/updateimagenperfil',[tiendasController::class, 'updateimagenPerfil']);
+
+
+Route::post('products', [ProductsController::class, 'store']);
+Route::get('productos-por-tienda/{tiendaId}', [tiendasController::class, 'mostrarProductosPorTienda']);
+
