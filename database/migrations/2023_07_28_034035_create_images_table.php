@@ -14,14 +14,17 @@ return new class extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tienda_id'); // Referencia a la tienda
-            $table->string('perfil');
-            $table->string('portada');
+            $table->string('perfil')->nullable();
+            $table->string('portada')->nullable();
             $table->timestamps();
     
             // Definir la relación con la tabla de tiendas
             $table->foreign('tienda_id')->references('id')->on('tiendas')->onDelete('cascade');
             
         });
+    
+
+        
     }
 
     /**
