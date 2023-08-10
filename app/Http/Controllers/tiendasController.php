@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\tiendas;
-use App\Models\Images;
-use App\Models\Categorias;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -21,56 +19,67 @@ class tiendasController extends Controller
     }
     public function store(Request $request)
     {
+
         // Validar los datos del formulario
         $request->validate([
             'propietario' => 'required|string',
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
-            'categoria_id' => 'required|integer',
+            'categoria' => 'required|string',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
-            'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-        if (!categorias::where('id', $request->categoria_id)->exists()) {
-            return response()->json(['error' => 'La categoría seleccionada no existe.'], 404);
-        }
-
-        // Crear el registro de la tienda en la base de datos
-        $tienda = new tiendas([
-            'propietario' => $request->propietario,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'negocio' => $request->negocio,
-            'categoria_id' =>$request->categoria_id,
-            'nit' => $request->nit,
-            'ubicacion' => $request->ubicacion,
-            'telefono' => $request->telefono,
-            'perfil' => $request->perfil,
-            'portada' => $request->portada,
+            
         ]);
        
-        $tienda->save();
-
-
-        $perfil = $request->file('perfil')->store('public/images');
-        $portada = $request->file('portada')->store('public/images');
-
-        $perfilUrl = Storage::url($perfil);
-        $portadaUrl = Storage::url($portada);
-
-        Images::create([
-            'tienda_id' => $tienda->id,
-            'perfil' => $perfilUrl,
-            'portada' => $portadaUrl,
-        ]);
-
-
+        $categoria = strtolower($request->categoria);
+        // Crear el registro de la tienda en la base de datos
+      $tienda = new tiendas([
+        'propietario' => $request->propietario,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'negocio' => $request->negocio,
+        'categoria' => $categoria,
+        'nit' => $request->nit,
+        'ubicacion' => $request->ubicacion,
+        'telefono' => $request->telefono,
+       
+         
+    ]);
+    $tienda->save();
         return response()->json(['data' => $tienda], 201);
     }
 
+    public function imagenPerfil(Request $request, Tiendas $tienda){
+        $request->validate([
+            'perfil'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        if ($request->hasFile('perfil')) {
+            $perfilPath = $request->file('perfil')->store('public/images');
+            $perfilUrl = Storage::url($perfilPath);
+            $tienda->perfil = $perfilUrl;
+            $tienda->save();
+        }
+        return response()->json(['succes' => 'Imagen de perfil subida exitosamente.'], 201);
+       
+    }
+
+    public function imagenPortada(Request $request, Tiendas $tienda){
+        $request->validate([
+            'portada'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        if ($request->hasFile('portada')) {
+            $portadaPath = $request->file('portada')->store('public/images');
+            $portadaUrl = Storage::url($portadaPath);
+            $tienda->portada = $portadaUrl;
+            $tienda->save();
+        }
+        return response()->json(['succes' => 'Imagen de portada subida exitosamente.'], 201);
+       
+    }
+
+    
 
     public function login(Request $request)
     {
@@ -124,15 +133,16 @@ class tiendasController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nombreP' => 'required|string',
-            'cedula' => 'required|string',
+            'propietario' => 'required|string',
             'email' => 'required|string|email',
             'password' => 'required|string',
-            'nombreN' => 'required|string',
-            'registro' => 'required|string',
+            'negocio' => 'required|string',
+            'categoria' => 'required|string',
+            'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
 
         ]);
 
@@ -146,20 +156,13 @@ class tiendasController extends Controller
             $tienda->imagen = $imagenPath;
         }
 
-        // Actualizar los campos del registro
-        $tienda->nombreP = $request->nombreP;
-        $tienda->cedula = $request->cedula;
-        $tienda->email = $request->email;
-        $tienda->password = Hash::make($request->password); // Actualizar la contraseña con el nuevo hash
-        $tienda->nombreN = $request->nombreN;
-        $tienda->registro = $request->registro;
-        $tienda->ubicacion = $request->ubicacion;
-        $tienda->telefono = $request->telefono;
+         $tienda = Tiendas::create($request->all());
 
-
-        // Guardar los cambios
-        $tienda->save();
 
         return response()->json(['message' => 'Registro actualizado correctamente'], 200);
     }
+
+
+
+    
 }
