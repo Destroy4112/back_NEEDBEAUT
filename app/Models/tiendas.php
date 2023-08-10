@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Casts\Attribute;
 class tiendas extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+   /* protected $fillable = [
         'propietario',
         'email',
         'password',
@@ -21,9 +21,20 @@ class tiendas extends Model
         'perfil',
         'portada',
     ];
-
-    public function categorias()
+*/
+    protected $guarded = [];
+   
+  
+    public function products()
     {
-        return $this->belongsTo(categoria::class, 'categoria_id');
+        return $this->hasMany(products::class);
     }
+
+ protected function propietario(): Attribute{
+    return new Attribute(
+
+        set:fn($value) => strtolower($value) 
+    );
+ }
+
 }
