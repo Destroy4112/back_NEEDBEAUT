@@ -31,8 +31,8 @@ Route::post('tiendas/{tienda}/imagenPerfil',[tiendasController::class, 'imagenPe
 Route::post('tiendas/{tienda}/imagenPortada',[tiendasController::class, 'imagenPortada']);
 Route::get('tiendas/categoria/{categoria}',[tiendasController::class, 'tiendasPorCategoria']);
 Route::patch('tiendas/{tienda}/updateimagenperfil',[tiendasController::class, 'updateimagenPerfil']);
+Route::post('tiendas/{tienda_id}/add-destacadas', [tiendasController::Class, 'addDestacadas']);
 
 
 Route::post('products', [ProductsController::class, 'store']);
 Route::get('productos-por-tienda/{tiendaId}', [tiendasController::class, 'mostrarProductosPorTienda']);
-
