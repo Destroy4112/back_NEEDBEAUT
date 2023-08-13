@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\tiendas;
+use App\Models\images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -43,9 +44,7 @@ class tiendasController extends Controller
         'categoria' => $categoria,
         'nit' => $request->nit,
         'ubicacion' => $request->ubicacion,
-        'telefono' => $request->telefono,
-       
-         
+         'telefono' => $request->telefono,  
     ]);
     $tienda->save();
         return response()->json(['data' => $tienda], 201);
@@ -57,14 +56,27 @@ class tiendasController extends Controller
         ]);
         if ($request->hasFile('perfil')) {
             $perfilPath = $request->file('perfil')->store('public/images');
-           // $perfilUrl = Storage::url($perfilPath);
-            $tienda->perfil = $perfilPath;
+            $perfilUrl = Storage::url($perfilPath);
+            $tienda->perfil = $perfilUrl;
             $tienda->save();
         }
         return response()->json(['succes' => 'Imagen de perfil subida exitosamente.'], 201);
     }
+    public function imagenPortada(Request $request, Tiendas $tienda){
+        $request->validate([
+            'portada'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        if ($request->hasFile('portada')) {
+            $portadaPath = $request->file('portada')->store('public/images');
+            $portadaUrl = Storage::url($portadaPath);
+            $tienda->portada = $portadaUrl;
+            $tienda->save();
+        }
+        return response()->json(['succes' => 'Imagen de portada subida exitosamente.'], 201);
+       
+    }
 
-    //update imagen de perfil
+    //update imagen de perfil - no funciona aun
     public function updateimagenPerfil(Request $request, Tiendas $tienda)
 {
     $request->validate([
@@ -87,18 +99,20 @@ class tiendasController extends Controller
 }
 
 
-    public function imagenPortada(Request $request, Tiendas $tienda){
+    public function addDestacadas(Request $request, $tienda_id)
+    {
+        $tienda = tiendas::findOrFail($tienda_id);
         $request->validate([
-            'portada'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'destacadas'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        if ($request->hasFile('portada')) {
-            $portadaPath = $request->file('portada')->store('public/images');
-            $portadaUrl = Storage::url($portadaPath);
-            $tienda->portada = $portadaUrl;
-            $tienda->save();
-        }
-        return response()->json(['succes' => 'Imagen de portada subida exitosamente.'], 201);
-       
+        $destacadaPath = $request->file('destacadas')->store('public/images');
+        $destacadaUrl= Storage::url($destacadaPath);
+        Images::create([
+            'tienda_id' => $tienda->id,
+            'destacadas' =>  $destacadaUrl,
+            
+        ]);
+         return response()->json(['succes' => 'Imagen destacada subida exitosamente.'], 201);
     }
 
     public function tiendasPorCategoria($categoria){
@@ -114,7 +128,6 @@ class tiendasController extends Controller
         $tienda = Tiendas::findOrFail($tiendaId);
         $productos = $tienda->products->map(function ($producto){
             return [
-                
                 'nombre' => $producto->nombre,
                 'precio' => $producto->precio,
             ];
@@ -122,9 +135,6 @@ class tiendasController extends Controller
     
         return response()->json($productos);
     }
-
-
-
 
     public function login(Request $request)
     {
@@ -140,7 +150,6 @@ class tiendasController extends Controller
                     "status" => 1,
                     "data" => $tienda
                 ]);
-
 
             } else {
                 return response()->json([
@@ -159,7 +168,6 @@ class tiendasController extends Controller
 
     public function destroy(tiendas $tienda)
     {
-        //
         $tienda->delete();
         $data = [
             'message' => 'tienda borrada correctamente',
@@ -170,7 +178,6 @@ class tiendasController extends Controller
 
     public function show(tiendas $tienda)
     {
-        //
         return response()->json($tienda);
     }
 
