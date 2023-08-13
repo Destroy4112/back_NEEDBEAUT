@@ -29,7 +29,10 @@ class tiendas extends Model
     {
         return $this->hasMany(products::class, 'tienda_id');
     }
-   
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
  protected function propietario(): Attribute{
     return new Attribute(
 
