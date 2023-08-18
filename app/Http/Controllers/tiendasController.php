@@ -31,28 +31,29 @@ class tiendasController extends Controller
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
-            
+
         ]);
-       
+
         $categoria = strtolower($request->categoria);
         // Crear el registro de la tienda en la base de datos
-      $tienda = new tiendas([
-        'propietario' => $request->propietario,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'negocio' => $request->negocio,
-        'categoria' => $categoria,
-        'nit' => $request->nit,
-        'ubicacion' => $request->ubicacion,
-         'telefono' => $request->telefono,  
-    ]);
-    $tienda->save();
+        $tienda = new tiendas([
+            'propietario' => $request->propietario,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'negocio' => $request->negocio,
+            'categoria' => $categoria,
+            'nit' => $request->nit,
+            'ubicacion' => $request->ubicacion,
+            'telefono' => $request->telefono,
+        ]);
+        $tienda->save();
         return response()->json(['data' => $tienda], 201);
     }
 
-    public function imagenPerfil(Request $request, Tiendas $tienda){
+    public function imagenPerfil(Request $request, Tiendas $tienda)
+    {
         $request->validate([
-            'perfil'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         if ($request->hasFile('perfil')) {
             $perfilPath = $request->file('perfil')->store('public/images');
@@ -62,9 +63,10 @@ class tiendasController extends Controller
         }
         return response()->json(['succes' => 'Imagen de perfil subida exitosamente.'], 201);
     }
-    public function imagenPortada(Request $request, Tiendas $tienda){
+    public function imagenPortada(Request $request, Tiendas $tienda)
+    {
         $request->validate([
-            'portada'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         if ($request->hasFile('portada')) {
             $portadaPath = $request->file('portada')->store('public/images');
@@ -73,49 +75,58 @@ class tiendasController extends Controller
             $tienda->save();
         }
         return response()->json(['succes' => 'Imagen de portada subida exitosamente.'], 201);
-       
+
     }
 
-    //update imagen de perfil - no funciona aun
-    public function updateimagenPerfil(Request $request, Tiendas $tienda)
-{
-    $request->validate([
-        'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048', 
-    ]);
 
-    if ($request->hasFile('perfil')) {
-        // Eliminar la imagen anterior si existe
-        if ($tienda->perfil) {
-            Storage::disk('public')->delete(str_replace('/storage', 'public', $tienda->perfil));
+    //no funciona bien aun 
+    public function actualizarImagen(Request $request, $id)
+    {
+
+        $request->validate([
+            'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Busca la tienda en la base de datos
+        $tienda = Tiendas::findOrFail($id);
+
+        // Si se proporcionó una nueva imagen, actualiza el campo correspondiente
+        if ($request->hasFile('perfil')) {
+            Storage::delete($tienda->perfil);
+            $perfilPath = $request->file('perfil')->store('public/images');
+            $perfilUrl = Storage::url($perfilPath);
+            $tienda->perfil = $perfilUrl;
+            $tienda->save();
+
+            return response()->json(['succes' => 'Imagen de perfil actualizada exitosamente.'], 201);
+        } else {
+            return response()->json(['Error' => 'No se pudo actualizar la imagen']);
         }
-        // Subir la nueva imagen
-        $perfilPath = $request->file('perfil')->store('public/images');
-        $perfilUrl = Storage::url($perfilPath);
-        $tienda->perfil = $perfilUrl;
-        $tienda->save();
-        return response()->json(['succes' => 'Imagen de perfil actualizada exitosamente.'], 201);
+
     }
-    return response()->json(['Error' => 'Error al actualizar Imagen de perfil.'], 201);
-}
+
+
+
 
 
     public function addDestacadas(Request $request, $tienda_id)
     {
         $tienda = tiendas::findOrFail($tienda_id);
         $request->validate([
-            'destacadas'=> 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'destacadas' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         $destacadaPath = $request->file('destacadas')->store('public/images');
-        $destacadaUrl= Storage::url($destacadaPath);
+        $destacadaUrl = Storage::url($destacadaPath);
         Images::create([
             'tienda_id' => $tienda->id,
-            'destacadas' =>  $destacadaUrl,
-            
+            'destacadas' => $destacadaUrl,
+
         ]);
-         return response()->json(['succes' => 'Imagen destacada subida exitosamente.'], 201);
+        return response()->json(['succes' => 'Imagen destacada subida exitosamente.'], 201);
     }
 
-    public function tiendasPorCategoria($categoria){
+    public function tiendasPorCategoria($categoria)
+    {
         $tiendas = Tiendas::where('categoria', $categoria)->get();
         if ($tiendas->isEmpty()) {
             return response()->json(['message' => 'No se encontraron tiendas para esta categoría.'], 404);
@@ -126,13 +137,13 @@ class tiendasController extends Controller
     public function mostrarProductosPorTienda($tiendaId)
     {
         $tienda = Tiendas::findOrFail($tiendaId);
-        $productos = $tienda->products->map(function ($producto){
+        $productos = $tienda->products->map(function ($producto) {
             return [
                 'nombre' => $producto->nombre,
                 'precio' => $producto->precio,
             ];
         });
-    
+
         return response()->json($productos);
     }
 
@@ -182,39 +193,38 @@ class tiendasController extends Controller
     }
 
     //falta probar funcionalidad de update
-    public function update(Request $request, $id)
+    public function updateTienda(Request $request, $id)
     {
         $request->validate([
             'propietario' => 'required|string',
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
-            'categoria' => 'required|string',
+            'categoria' => 'required|string|in:moda, belleza',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
-            'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'portada' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
 
         ]);
 
         // Obtener el registro de tienda existente por su ID
         $tienda = tiendas::findOrFail($id);
-
-        // Procesar la imagen (si se cargó una)
-        $imagen = $request->file('imagen');
-        if ($imagen) {
-            $imagenPath = $imagen->store('images', 'public');
-            $tienda->imagen = $imagenPath;
+        // Actualiza los campos
+        $tienda->propietario = $request->propietario;
+        $tienda->email=$request->email;
+        $tienda->categoria = $request->categoria;
+        $tienda->nit = $request->nit;
+        $tienda->ubicacion= $request->ubicacion;
+        $tienda->telefono = $request->telefono;
+        
+        // Si se proporcionó una nueva contraseña, actualízala
+        if ($request->filled('password')) {
+            $tienda->password = Hash::make($request->password);
         }
-
-         $tienda = Tiendas::create($request->all());
-
+        // Guarda los cambios en la base de datos
+        $tienda->save();
 
         return response()->json(['message' => 'Registro actualizado correctamente'], 200);
     }
 
-
-
-    
 }
