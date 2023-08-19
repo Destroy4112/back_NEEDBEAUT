@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\products;
+use App\Models\tiendas;
 use Illuminate\Http\Request;
+
 
 
 class productsController extends Controller
@@ -29,5 +31,16 @@ class productsController extends Controller
          return response()->json(['message' =>' producto guardado exitosamente'], 201);
 
     }
-   
+
+    public function mostrarTiendaPorProducto($nombre)
+    {
+        $tienda = Products::where('nombre', $nombre)->get();
+        $tiendas = $tienda->map(function ($producto) {
+          
+            return Tiendas::find($producto->tienda_id);
+     
+        });
+        return response()->json($tiendas);
+    }
+
 }

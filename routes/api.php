@@ -35,3 +35,4 @@ Route::put('tiendas/{id}/actualizarImagen',[tiendasController::Class,'actualizar
 
 Route::post('products', [ProductsController::class, 'store']);
 Route::get('productos-por-tienda/{tiendaId}', [tiendasController::class, 'mostrarProductosPorTienda']);
+Route::get('products/{nombre}/mostrarTiendaPorProducto', [ProductsController::class, 'mostrarTiendaPorProducto']);

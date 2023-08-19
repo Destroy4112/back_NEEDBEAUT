@@ -192,7 +192,7 @@ class tiendasController extends Controller
         return response()->json($tienda);
     }
 
-    //falta probar funcionalidad de update
+   
     public function updateTienda(Request $request, $id)
     {
         $request->validate([
@@ -226,5 +226,8 @@ class tiendasController extends Controller
 
         return response()->json(['message' => 'Registro actualizado correctamente'], 200);
     }
+
+
+    
 
 }
