@@ -27,7 +27,7 @@ class tiendasController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
-            'categoria' => 'required|string|in:moda, belleza',
+            'categoria' => 'required|string',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
