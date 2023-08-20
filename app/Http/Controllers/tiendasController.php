@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class tiendasController extends Controller
 {
 
@@ -27,6 +28,7 @@ class tiendasController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
+            'slogan'=> 'required|string',
             'categoria' => 'required|string|in:moda, belleza',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
@@ -41,6 +43,7 @@ class tiendasController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'negocio' => $request->negocio,
+            'slogan' => $request->slogan,
             'categoria' => $categoria,
             'nit' => $request->nit,
             'ubicacion' => $request->ubicacion,
@@ -78,37 +81,29 @@ class tiendasController extends Controller
 
     }
 
-
-    //no funciona bien aun 
-    public function actualizarImagen(Request $request, $id)
-    {
-
+    //no funciona
+    public function actualizarImagenPerfil(Request $request, $id) {
         $request->validate([
             'perfil' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        // Busca la tienda en la base de datos
-        $tienda = Tiendas::findOrFail($id);
-
-        // Si se proporcionó una nueva imagen, actualiza el campo correspondiente
-        if ($request->hasFile('perfil')) {
-            Storage::delete($tienda->perfil);
-            $perfilPath = $request->file('perfil')->store('public/images');
-            $perfilUrl = Storage::url($perfilPath);
-            $tienda->perfil = $perfilUrl;
-            $tienda->save();
-
-            return response()->json(['succes' => 'Imagen de perfil actualizada exitosamente.'], 201);
+        $tienda = Tiendas::find($id);
+        if ($tienda) {
+            if ($request->hasFile('perfil')) {
+                Storage::delete($tienda->perfil);
+                $nuevaImagen = $request->file('perfil')->store('public/images');
+                $perfilUrl = Storage::url($nuevaImagen);
+                $tienda->perfil = $perfilUrl;
+                $tienda->save();
+                return response()->json(['mensaje' => 'Imagen de perfil actualizada correctamente']);
+            } else {
+                return response()->json(['error' => 'No se proporcionó una nueva imagen'], 400);
+            }
         } else {
-            return response()->json(['Error' => 'No se pudo actualizar la imagen']);
+            return response()->json(['error' => 'Tienda no encontrada'], 404);
         }
-
     }
-
-
-
-
-
+ 
+ 
     public function addDestacadas(Request $request, $tienda_id)
     {
         $tienda = tiendas::findOrFail($tienda_id);
@@ -200,6 +195,7 @@ class tiendasController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
             'negocio' => 'required|string',
+            'slogan' => 'required|string',
             'categoria' => 'required|string|in:moda, belleza',
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
@@ -213,6 +209,8 @@ class tiendasController extends Controller
         $tienda->propietario = $request->propietario;
         $tienda->email=$request->email;
         $tienda->categoria = $request->categoria;
+        $tienda->negocio= $request->negocio;
+        $tienda->slogan= $request->slogan;
         $tienda->nit = $request->nit;
         $tienda->ubicacion= $request->ubicacion;
         $tienda->telefono = $request->telefono;
@@ -224,10 +222,9 @@ class tiendasController extends Controller
         // Guarda los cambios en la base de datos
         $tienda->save();
 
-        return response()->json(['message' => 'Registro actualizado correctamente'], 200);
+        return response()->json(['message' => 'Tienda actualizada correctamente'], 200);
     }
 
-
-    
+  
 
 }
