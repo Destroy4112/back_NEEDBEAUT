@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('precio');
             $table->integer('cantidad');
+            $table->String('imagen')->nullable();
             $table->timestamps();
 
              // Definir la relación con la tabla de tiendas
