@@ -5,16 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\tiendasController;
 use App\Http\Controllers\ProductsController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -33,6 +23,6 @@ Route::get('tiendas/categoria/{categoria}',[tiendasController::class, 'tiendasPo
 Route::post('tiendas/{tienda_id}/add-destacadas', [tiendasController::Class, 'addDestacadas']);
 Route::put('tiendas/{id}/actualizarImagen',[tiendasController::Class,'actualizarImagen']);
 
-Route::post('products', [ProductsController::class, 'store']);
-Route::get('productos-por-tienda/{tiendaId}', [tiendasController::class, 'mostrarProductosPorTienda']);
-Route::get('products/{nombre}/mostrarTiendaPorProducto', [ProductsController::class, 'mostrarTiendaPorProducto']);
+Route::post('products', [productsController::class, 'store']);
+Route::get('products/{nombre}/mostrarTiendaPorProducto', [productsController::class, 'mostrarTiendaPorProducto']);
+Route::put('products/{id}/update-product', [productsController::class, 'updateProducto']);
