@@ -17,7 +17,34 @@ class productsController extends Controller
 
         return response()->json($products);
     }
+public function store (Request $request){
+    $request->validate([
+        'tienda_id'=>'required|exists:tiendas,id',
+        'codigo' => 'required|string',
+        'nombre' => 'required|string',
+        'precio' => 'required|numeric',
+        'cantidad' => 'required|integer',
+        'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        
+    ]);
 
+    $producto = new products([
+        'tienda_id'=>$request->tienda_id,
+        'codigo' => $request->codigo,
+        'nombre' => $request->nombre,
+        'precio' => $request->precio,
+        'cantidad' => $request->cantidad,
+        
+    ]);
+    if ($request->hasFile('imagen')) {
+        $nombreOriginal = $request->file('imagen')->getClientOriginalName();
+        $imagen = $request->file('imagen')->storeAs('public/images', $nombreOriginal);
+        $producto->imagen = Storage::url($imagen);
+    }
+    $producto->save();
+
+    return response()->json(['mensaje' => 'Producto agregado a la tienda']);
+}
 
     public function mostrarTiendaPorProducto($nombre)
     {

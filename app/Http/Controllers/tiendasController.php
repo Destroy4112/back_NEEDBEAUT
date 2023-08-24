@@ -101,35 +101,6 @@ class tiendasController extends Controller
     {
         return response()->json($tienda);
     }
-    public function agregarImagenPerfil(Request $request, $id) {
-        $tienda = Tiendas::find($id);
-        if (!$tienda) {
-            return response()->json(['message' => 'Tienda no encontrada'], 404);
-        }
-        if ($request->hasFile('perfil')) {
-            $nombreOriginal = $request->file('perfil')->getClientOriginalName();
-            $perfilPath = $request->file('perfil')->storeAs('public/images',$nombreOriginal);
-            $tienda->perfil  = Storage::url($perfilPath);
-            $tienda->save();
-            return response()->json(['message' => 'Imagen de Perfil agregada correctamente'], 200);
-        }
-        return response()->json(['message' => 'No se proporcionó ninguna imagen'], 400);
-    }
-    public function agregarImagenPortada(Request $request, $id)
-    {
-        $tienda = Tiendas::find($id);
-        if (!$tienda) {
-            return response()->json(['message' => 'Tienda no encontrada'], 404);
-        }
-        if ($request->hasFile('portada')) {
-            $nombreOriginal = $request->file('portada')->getClientOriginalName();
-            $perfilPath = $request->file('portada')->storeAs('public/images',$nombreOriginal);
-            $tienda->portada  = Storage::url($perfilPath);
-            $tienda->save();
-            return response()->json(['message' => 'Imagen de Portada agregada correctamente'], 200);
-        }
-        return response()->json(['message' => 'No se proporcionó ninguna imagen'], 400);
-    }
 
     public function addDestacadas(Request $request, $tienda_id)
     {
@@ -205,7 +176,7 @@ class tiendasController extends Controller
 
         return response()->json(['message' => 'Tienda actualizada correctamente'], 200);
     }
-    public function actualizarImagenPerfil(Request $request, $id) {
+    public function addImagenPerfil(Request $request, $id) {
         $tienda = Tiendas::find($id);
     
         if (!$tienda) {
@@ -224,12 +195,12 @@ class tiendasController extends Controller
             }
                 $tienda->perfil = $imagenUrl;
                 $tienda->save();
-                return response()->json(['message' => 'Imagen de perfil actualizada exitosamente'], 200);
+                return response()->json(['message' => 'Imagen de perfil subida exitosamente'], 200);
             }
             return response()->json(['message' => 'imagen no cargada'], 400);   
     }
 
-    public function actualizarImagenPortada(Request $request, $id) {
+    public function addImagenPortada(Request $request, $id) {
         $tienda = Tiendas::find($id);
     
         if (!$tienda) {
@@ -248,68 +219,9 @@ class tiendasController extends Controller
             }
                 $tienda->portada = $imagenUrl;
                 $tienda->save();
-                return response()->json(['message' => 'Imagen de portada actualizada exitosamente'], 200);
+                return response()->json(['message' => 'Imagen de portada subida exitosamente'], 200);
             }
             return response()->json(['message' => 'imagen no cargada'], 400);   
     }
-
-    public function agregarProducto(Request $request, Tiendas $tienda)
-    {
-        $request->validate([
-            'codigo' => 'required|string',
-            'nombre' => 'required|string',
-            'precio' => 'required|numeric',
-            'cantidad' => 'required|integer',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            
-        ]);
-
-        $producto = new products([
-            'codigo' => $request->codigo,
-            'nombre' => $request->nombre,
-            'precio' => $request->precio,
-            'cantidad' => $request->cantidad,
-            
-        ]);
-        if ($request->hasFile('imagen')) {
-            $nombreOriginal = $request->file('imagen')->getClientOriginalName();
-            $imagen = $request->file('imagen')->storeAs('public/images', $nombreOriginal);
-            $producto->imagen = Storage::url($imagen);
-        }
-        $tienda->products()->save($producto);
-
-        return response()->json(['mensaje' => 'Producto agregado a la tienda']);
-    }
-
-    public function actualizarProducto(Request $request, Tiendas $tienda, Products $producto)
-    {
-        $request->validate([
-            'codigo' => 'required|string',
-            'nombre' => 'required|string',
-            'precio' => 'required|numeric',
-            'cantidad' => 'required|integer',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-        $producto=products::FindOrFail($producto);
-        $producto->codigo = $request->codigo;
-        $producto->nombre = $request->nombre;
-        $producto->precio = $request->precio;
-        $producto->cantidad = $request->cantidad;
-
-
-        if ($request->hasFile('imagen')) {
-            Storage::delete($producto->imagen);
-            $imagen = $request->file('imagen')->store('public/images');
-            $producto->imagen = Storage::url($imagen);
-        }
-
-        $producto->save();
-
-        return response()->json(['mensaje' => 'Producto actualizado']);
-    }
-
-   
-
-
     
 }

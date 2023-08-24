@@ -17,15 +17,13 @@ Route::put('tiendas/{id}/update-tienda', [tiendasController::class, 'updateTiend
 Route::delete('tiendas/{tienda}', [tiendasController::class, 'destroy']);
 Route::get('tiendas/{tienda}', [tiendasController::class, 'show']);
 Route::get('tiendas/{categoria_id}', [tiendasController::class, 'category']);
-Route::get('tiendas/categoria/{categoria}',[tiendasController::class, 'tiendasPorCategoria']);
+Route::get('tiendas/categoria/{categoria}', [tiendasController::class, 'tiendasPorCategoria']);
 Route::post('tiendas/{tienda_id}/add-destacadas', [tiendasController::Class, 'addDestacadas']);
-Route::get('tiendas/productos-por-tiendas/{tiendaId}',[tiendasController::class, 'mostrarProductosPorTienda']);
-Route::post('tiendas/{tienda}/agregar-producto', [tiendasController::class, 'agregarProducto']);
-Route::put('tiendas/{tienda}/productos/{producto}',[tiendasController::class, 'actualizarProducto']);
-Route::post('tiendas/{id}/agregar-imagen-perfil', [TiendasController::class, 'agregarImagenPerfil']);
-Route::put('tiendas/{id}/actualizar-imagen-perfil', [TiendasController::class, 'actualizarImagenPerfil']);
-Route::post('tiendas/{id}/agregar-imagen-portada', [TiendasController::class, 'agregarImagenPortada']);
-Route::put('tiendas/{id}/actualizar-imagen-portada', [TiendasController::class, 'actualizarImagenPortada']);
+Route::get('tiendas/productos-por-tiendas/{tiendaId}', [tiendasController::class, 'mostrarProductosPorTienda']);
+Route::put('tiendas/{tienda}/productos/{producto}', [tiendasController::class, 'actualizarProducto']);
+Route::post('tiendas/{id}/agregar-imagen-perfil', [TiendasController::class, 'addImagenPerfil']);
+Route::post('tiendas/{id}/agregar-imagen-portada', [TiendasController::class, 'addImagenPortada']);
+
 
 Route::post('products', [productsController::class, 'store']);
 Route::get('products/{nombre}/mostrarTiendaPorProducto', [productsController::class, 'mostrarTiendaPorProducto']);
