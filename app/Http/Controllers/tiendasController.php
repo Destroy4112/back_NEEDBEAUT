@@ -7,7 +7,7 @@ use App\Models\images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Products;
+
 
 
 
@@ -121,7 +121,7 @@ class tiendasController extends Controller
 
     public function tiendasPorCategoria($categoria)
     {
-        $tiendas = Tiendas::where('categoria', $categoria)->get();
+        $tiendas = Tiendas::where('categoria', $categoria)->select('negocio','slogan', 'email', 'ubicacion', 'telefono')->get();
         if ($tiendas->isEmpty()) {
             return response()->json(['message' => 'No se encontraron tiendas para esta categoría.'], 404);
         }
@@ -133,8 +133,10 @@ class tiendasController extends Controller
         $tienda = Tiendas::findOrFail($tiendaId);
         $productos = $tienda->products->map(function ($producto) {
             return [
+                'id'=>$producto->id,
                 'nombre' => $producto->nombre,
                 'precio' => $producto->precio,
+                'imagen'=>$producto->imagen,
             ];
         });
 
@@ -195,7 +197,7 @@ class tiendasController extends Controller
             }
                 $tienda->perfil = $imagenUrl;
                 $tienda->save();
-                return response()->json(['message' => 'Imagen de perfil subida exitosamente'], 200);
+                return response()->json(['message' => 'Imagen de perfil subida exitosamente', 'data'=>$tienda], 200);
             }
             return response()->json(['message' => 'imagen no cargada'], 400);   
     }
@@ -219,7 +221,7 @@ class tiendasController extends Controller
             }
                 $tienda->portada = $imagenUrl;
                 $tienda->save();
-                return response()->json(['message' => 'Imagen de portada subida exitosamente'], 200);
+                return response()->json(['message' => 'Imagen de portada subida exitosamente', 'data'=>$tienda], 200);
             }
             return response()->json(['message' => 'imagen no cargada'], 400);   
     }
