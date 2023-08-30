@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\categorias;
+
 class categoriasController extends Controller
 {
-    //
     public function tiendasPorCategoria(Categorias $categoria)
     {
         $tiendas = $categoria->tiendas;
@@ -16,4 +16,3 @@ class categoriasController extends Controller
         return response()->json($tiendas);
     }
 }
-
