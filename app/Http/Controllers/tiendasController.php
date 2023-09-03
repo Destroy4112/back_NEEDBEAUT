@@ -8,25 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-
-
-
-/**
- * Summary of tiendasController
- */
 class tiendasController extends Controller
 {
 
     public function index()
     {
         $tienda = Tiendas::all();
-
         return response()->json($tienda);
     }
+
     public function store(Request $request)
     {
-
-        // Validar los datos del formulario
         $request->validate([
             'propietario' => 'required|string',
             'email' => 'required|string|email',
@@ -37,11 +29,8 @@ class tiendasController extends Controller
             'nit' => 'required|string',
             'ubicacion' => 'required|string',
             'telefono' => 'required|string',
-
         ]);
-
         $categoria = strtolower($request->categoria);
-        // Crear el registro de la tienda en la base de datos
         $tienda = new tiendas([
             'propietario' => $request->propietario,
             'email' => $request->email,
@@ -55,7 +44,23 @@ class tiendasController extends Controller
         ]);
         $tienda->save();
         $tiendaRegistrada = Tiendas::find($tienda->id, ['negocio', 'slogan', 'email', 'ubicacion', 'telefono']);
-        return response()->json(['data' => $tiendaRegistrada], 201);
+        $tiendaRegistrada = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada']);
+        return response()->json(['data' => $tiendaRegistradaRegistrada], 201);
+    }    
+
+    public function show(tiendas $tienda)
+    {
+        return response()->json($tienda);
+    }
+
+    public function destroy(tiendas $tienda)
+    {
+        $tienda->delete();
+        $data = [
+            'message' => 'tienda borrada correctamente',
+            'tienda' => $tienda
+        ];
+        return response()->json($data);
     }
 
     public function login(Request $request)
@@ -64,15 +69,13 @@ class tiendasController extends Controller
             'email' => ['required'],
             'password' => ['required'],
         ]);
-
         $tienda = tiendas::where("email", "=", $request->email)->first();
         if (!is_null($tienda)) {
             if (Hash::check($request->password, $tienda->password)) {
                 return response()->json([
                     "status" => 1,
-                    "data" => $tienda = Tiendas::find($tienda->id, ['negocio', 'slogan', 'email', 'ubicacion', 'telefono']),
+                    "data" =>  $tienda = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada']), = Tiendas::find($tienda->id, ['negocio', 'slogan', 'email', 'ubicacion', 'telefono']),
                 ]);
-
             } else {
                 return response()->json([
                     "status" => 2,
@@ -85,22 +88,6 @@ class tiendasController extends Controller
                 "message" => "Usuario no Registrado",
             ], 200);
         }
-    }
-
-
-    public function destroy(tiendas $tienda)
-    {
-        $tienda->delete();
-        $data = [
-            'message' => 'tienda borrada correctamente',
-            'tienda' => $tienda
-        ];
-        return response()->json($data);
-    }
-
-    public function show(tiendas $tienda)
-    {
-        return response()->json($tienda);
     }
 
     public function addDestacadas(Request $request, $tienda_id)
@@ -146,7 +133,7 @@ class tiendasController extends Controller
     }
     public function tiendasPorCategoria($categoria)
     {
-        $tiendas = Tiendas::where('categoria', $categoria)->select('negocio', 'slogan', 'email', 'ubicacion', 'telefono')->get();
+        $tiendas = Tiendas::where('categoria', $categoria)->select('id', 'negocio',  'slogan', 'perfil')->get();
         if ($tiendas->isEmpty()) {
             return response()->json(['message' => 'No se encontraron tiendas para esta categoría.'], 404);
         }
@@ -164,7 +151,6 @@ class tiendasController extends Controller
                 'imagen' => $producto->imagen,
             ];
         });
-
         return response()->json($productos);
     }
 
@@ -182,9 +168,7 @@ class tiendasController extends Controller
             'telefono' => 'required|string',
 
         ]);
-        // Obtener el registro de tienda existente por su ID
         $tienda = tiendas::findOrFail($id);
-        // Actualiza los campos
         $tienda->propietario = $request->propietario;
         $tienda->email = $request->email;
         $tienda->categoria = $request->categoria;
@@ -194,66 +178,58 @@ class tiendasController extends Controller
         $tienda->ubicacion = $request->ubicacion;
         $tienda->telefono = $request->telefono;
 
-        // Si se proporcionó una nueva contraseña, actualízala
         if ($request->filled('password')) {
             $tienda->password = Hash::make($request->password);
         }
-        // Guarda los cambios en la base de datos
         $tienda->save();
-
         return response()->json(['message' => 'Tienda actualizada correctamente'], 200);
     }
-    public function addImagenPerfil(Request $request, $id)
-    {
+    public function addImagenPerfil(Request $request, $id) {
         $tienda = Tiendas::find($id);
-
+    
         if (!$tienda) {
             return response()->json(['message' => 'Tienda no encontrada'], 404);
         }
-
+    
         if ($request->hasFile('perfil')) {
-            $img = $request->file(('perfil'));
-            $nombreOriginal = time() . '_' . $img->getClientOriginalName();
-            // Subir la nueva imagen
-            $imagen = $request->file('perfil')->storeAs('public/images', $nombreOriginal);
-            $imagenUrl = Storage::url($imagen);
-            // Eliminar la ruta de la imagen anterior si existe
+       
+            $nombreOriginal = $request->file('perfil')->getClientOriginalName();
+                // Subir la nueva imagen
+                $imagen = $request->file('perfil')->storeAs('public/images', $nombreOriginal);
+                $imagenUrl = Storage::url($imagen);
+                 // Eliminar la ruta de la imagen anterior si existe
             if ($tienda->perfil && $tienda->perfil != $imagenUrl) {
                 Storage::disk('local')->delete(str_replace('/storage', 'public', $tienda->perfil));
             }
-            $tienda->perfil = $imagenUrl;
-            $tienda->save();
-            $tienda = Tiendas::where('id', $id)->select('negocio', 'slogan', 'email', 'ubicacion', 'telefono')->get();
-            return response()->json(['message' => 'Imagen de perfil subida exitosamente', 'data' => $tienda], 200);
-        }
-        return response()->json(['message' => 'imagen no cargada'], 400);
+                $tienda->perfil = $imagenUrl;
+                $tienda->save();
+                return response()->json(['message' => 'Imagen de perfil subida exitosamente', 'data'=>$tienda], 200);
+            }
+            return response()->json(['message' => 'imagen no cargada'], 400);   
     }
 
-    public function addImagenPortada(Request $request, $id)
-    {
+    public function addImagenPortada(Request $request, $id) {
         $tienda = Tiendas::find($id);
-
+    
         if (!$tienda) {
             return response()->json(['message' => 'Tienda no encontrada'], 404);
         }
-
+    
         if ($request->hasFile('portada')) {
-            $img = $request->file(('portada'));
-            $nombreOriginal = time() . '_' . $img->getClientOriginalName();
-
-            // Subir la nueva imagen
-            $imagen = $request->file('portada')->storeAs('public/images', $nombreOriginal);
-            $imagenUrl = Storage::url($imagen);
-            // Eliminar la ruta de la imagen anterior si existe
+       
+            $nombreOriginal = $request->file('portada')->getClientOriginalName();
+                // Subir la nueva imagen
+                $imagen = $request->file('portada')->storeAs('public/images', $nombreOriginal);
+                $imagenUrl = Storage::url($imagen);
+                 // Eliminar la ruta de la imagen anterior si existe
             if ($tienda->portada && $tienda->portada != $imagenUrl) {
                 Storage::disk('local')->delete(str_replace('/storage', 'public', $tienda->portada));
             }
-            $tienda->portada = $imagenUrl;
-            $tienda->save();
-            $tienda = Tiendas::where('id', $id)->select('negocio', 'slogan', 'email', 'ubicacion', 'telefono')->get();
-            return response()->json(['message' => 'Imagen de portada subida exitosamente', 'data' => $tienda], 200);
-        }
-        return response()->json(['message' => 'imagen no cargada'], 400);
+                $tienda->portada = $imagenUrl;
+                $tienda->save();
+                return response()->json(['message' => 'Imagen de portada subida exitosamente', 'data'=>$tienda], 200);
+            }
+            return response()->json(['message' => 'imagen no cargada'], 400);   
     }
-
+    
 }
