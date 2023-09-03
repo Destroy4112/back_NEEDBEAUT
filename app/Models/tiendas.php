@@ -31,7 +31,7 @@ class tiendas extends Model
     }
     public function images()
     {
-        return $this->hasMany(Image::class);
+        return $this->hasMany(Image::class,'tienda_id');
     }
  protected function propietario(): Attribute{
     return new Attribute(

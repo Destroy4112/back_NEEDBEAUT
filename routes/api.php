@@ -23,7 +23,7 @@ Route::get('tiendas/productos-por-tiendas/{tiendaId}', [tiendasController::class
 Route::put('tiendas/{tienda}/productos/{producto}', [tiendasController::class, 'actualizarProducto']);
 Route::post('tiendas/{id}/agregar-imagen-perfil', [TiendasController::class, 'addImagenPerfil']);
 Route::post('tiendas/{id}/agregar-imagen-portada', [TiendasController::class, 'addImagenPortada']);
-
+Route::get('tiendas/{tienda_id}/imagenes-destacadas', [TiendasController::class, 'mostrarImagenesDestacadas']);
 
 Route::post('products', [productsController::class, 'store']);
 Route::get('products/{nombre}/mostrarTiendaPorProducto', [productsController::class, 'mostrarTiendaPorProducto']);
