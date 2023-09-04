@@ -43,9 +43,8 @@ class tiendasController extends Controller
             'telefono' => $request->telefono,
         ]);
         $tienda->save();
-        $tiendaRegistrada = Tiendas::find($tienda->id, ['negocio', 'slogan', 'email', 'ubicacion', 'telefono']);
         $tiendaRegistrada = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada']);
-        return response()->json(['data' => $tiendaRegistradaRegistrada], 201);
+        return response()->json(['data' => $tiendaRegistrada], 201);
     }    
 
     public function show(tiendas $tienda)
@@ -74,7 +73,8 @@ class tiendasController extends Controller
             if (Hash::check($request->password, $tienda->password)) {
                 return response()->json([
                     "status" => 1,
-                    "data" =>  $tienda = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada']), = Tiendas::find($tienda->id, ['negocio', 'slogan', 'email', 'ubicacion', 'telefono']),
+                    "data" =>  $tienda = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 
+                    'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada'])
                 ]);
             } else {
                 return response()->json([
