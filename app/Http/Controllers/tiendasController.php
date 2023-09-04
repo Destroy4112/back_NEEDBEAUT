@@ -45,7 +45,7 @@ class tiendasController extends Controller
         $tienda->save();
         $tiendaRegistrada = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada']);
         return response()->json(['data' => $tiendaRegistrada], 201);
-    }    
+    }
 
     public function show(tiendas $tienda)
     {
@@ -68,13 +68,13 @@ class tiendasController extends Controller
             'email' => ['required'],
             'password' => ['required'],
         ]);
+
         $tienda = tiendas::where("email", "=", $request->email)->first();
         if (!is_null($tienda)) {
             if (Hash::check($request->password, $tienda->password)) {
                 return response()->json([
                     "status" => 1,
-                    "data" =>  $tienda = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 
-                    'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada'])
+                    "data" =>  $tienda = Tiendas::find($tienda->id, ['id', 'propietario', 'negocio', 'nit', 'categoria', 'slogan', 'email', 'ubicacion', 'telefono', 'perfil', 'portada']),
                 ]);
             } else {
                 return response()->json([
@@ -124,7 +124,7 @@ class tiendasController extends Controller
         // Obtén las imágenes destacadas asociadas a la tienda
         $imagenesDestacadas = $tienda->images->map(function ($imagen) {
             return [
-                'id'=>$imagen->id,
+                'id' => $imagen->id,
                 'tienda_id' => $imagen->tienda_id,
                 'destacadas' => $imagen->destacadas,
             ];
@@ -184,52 +184,53 @@ class tiendasController extends Controller
         $tienda->save();
         return response()->json(['message' => 'Tienda actualizada correctamente'], 200);
     }
-    public function addImagenPerfil(Request $request, $id) {
+    public function addImagenPerfil(Request $request, $id)
+    {
         $tienda = Tiendas::find($id);
-    
+
         if (!$tienda) {
             return response()->json(['message' => 'Tienda no encontrada'], 404);
         }
-    
+
         if ($request->hasFile('perfil')) {
-       
+
             $nombreOriginal = $request->file('perfil')->getClientOriginalName();
-                // Subir la nueva imagen
-                $imagen = $request->file('perfil')->storeAs('public/images', $nombreOriginal);
-                $imagenUrl = Storage::url($imagen);
-                 // Eliminar la ruta de la imagen anterior si existe
+            // Subir la nueva imagen
+            $imagen = $request->file('perfil')->storeAs('public/images', $nombreOriginal);
+            $imagenUrl = Storage::url($imagen);
+            // Eliminar la ruta de la imagen anterior si existe
             if ($tienda->perfil && $tienda->perfil != $imagenUrl) {
                 Storage::disk('local')->delete(str_replace('/storage', 'public', $tienda->perfil));
             }
-                $tienda->perfil = $imagenUrl;
-                $tienda->save();
-                return response()->json(['message' => 'Imagen de perfil subida exitosamente', 'data'=>$tienda], 200);
-            }
-            return response()->json(['message' => 'imagen no cargada'], 400);   
+            $tienda->perfil = $imagenUrl;
+            $tienda->save();
+            return response()->json(['message' => 'Imagen de perfil subida exitosamente', 'data' => $tienda], 200);
+        }
+        return response()->json(['message' => 'imagen no cargada'], 400);
     }
 
-    public function addImagenPortada(Request $request, $id) {
+    public function addImagenPortada(Request $request, $id)
+    {
         $tienda = Tiendas::find($id);
-    
+
         if (!$tienda) {
             return response()->json(['message' => 'Tienda no encontrada'], 404);
         }
-    
+
         if ($request->hasFile('portada')) {
-       
+
             $nombreOriginal = $request->file('portada')->getClientOriginalName();
-                // Subir la nueva imagen
-                $imagen = $request->file('portada')->storeAs('public/images', $nombreOriginal);
-                $imagenUrl = Storage::url($imagen);
-                 // Eliminar la ruta de la imagen anterior si existe
+            // Subir la nueva imagen
+            $imagen = $request->file('portada')->storeAs('public/images', $nombreOriginal);
+            $imagenUrl = Storage::url($imagen);
+            // Eliminar la ruta de la imagen anterior si existe
             if ($tienda->portada && $tienda->portada != $imagenUrl) {
                 Storage::disk('local')->delete(str_replace('/storage', 'public', $tienda->portada));
             }
-                $tienda->portada = $imagenUrl;
-                $tienda->save();
-                return response()->json(['message' => 'Imagen de portada subida exitosamente', 'data'=>$tienda], 200);
-            }
-            return response()->json(['message' => 'imagen no cargada'], 400);   
+            $tienda->portada = $imagenUrl;
+            $tienda->save();
+            return response()->json(['message' => 'Imagen de portada subida exitosamente', 'data' => $tienda], 200);
+        }
+        return response()->json(['message' => 'imagen no cargada'], 400);
     }
-    
 }
